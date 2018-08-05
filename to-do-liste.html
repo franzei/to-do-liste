@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>To-do-List</title>
+  <link rel="stylesheet" href="jquery-ui.min.css">
+  <link rel="stylesheet" href="jquery-ui.theme.min.css">
+  <!--<script src="jquery-3.3.1.min.js"></script>
+  <script src="jqueryui/jquery-ui.min.js"></script>-->
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+  <script>
+
+  var entferneEintrag = function( id ) {
+  	$.ajax({
+      url:'http://localhost:8000',
+      method:'post',
+      contentType:'application/json',
+  		data:JSON.stringify({anfragetyp:'entfernen',id:id}),
+  		success:function(response){
+  			if ( response.erfolg ) {
+  				zeigeAlleEintraege();
+  				alert( 'Eintrag wurde gelöscht.','Erfolg');
+
+  			} else {
+  				alert( 'Fehler...' );
+  			}
+  		}
+  	})
+
+  }
+
+  var zeigeAlleEintraege = function() {
+  	$.ajax({
+      url:'http://localhost:8000',
+      method:'post',
+      contentType:'application/json',
+  		data:JSON.stringify({anfragetyp:'lesen'}),
+  		success:function(response) {
+
+  			$( '#liste' ).empty();
+
+  			var sortListe = $( '<ol>' ).appendTo( '#liste' );
+
+        var btnEntfernen = $('<button>').html('Löschen').data('i',i);
+
+        btnEntfernen.on('click',function(){
+            var i = $(this).data('i');
+            frageEntfernen( response.tasks[i].id );
+        });
+
+        var btnEditieren = $('<button>').html('Editieren');
+
+  			for ( var i in response.tasks ) {
+
+          $( '<li>' )
+  					.append( $('<span>').html( 'ID#'+response.tasks[i].id ) )
+  					.append( $('<span>').html( response.tasks[i].name ) )
+  					.append( $('<span>').html( 'erst. am'+response.tasks[i].daterstellt ) )
+  					.append( $('<span>').html( 'erled. am'+response.tasks[i].daterled ) )
+  					.append( $('<span>').html( 'Prio'+response.tasks[i].prio ) )
+  					.append( btnEntfernen )
+  					.append( btnEditieren )
+  					.appendTo( 'ol' );
+
+  			}
+
+  			sortListe.sortable();
+
+  		}
+  	})
+  }  // ende zeigeAlleEintraege
+
+  $( document ).on( 'submit', '#neuerEintrag', function( event ) {
+  	event.preventDefault( );
+
+    $('#neuerEintrag').dialog();
+
+  	var neuerTask = {
+  		anfragetyp:'neu',
+  		Aufgabe:$('#nTask').val(),
+  		DatumErstelltAm:$('#erstam').val(),
+  		DatumErledigtAm:$('#erlam').val(),
+  		Prioritaet:$('#selprio').val(),
+  	}
+
+  	$( '#newTask' ).prop('disabled', true );
+
+  	$.ajax({
+  		url:'http://localhost:8000',
+  		method:'post',
+  		contentType:'application/json', // weil in Schnittstelle Datenformat Request JSON steht!!!
+  		data:JSON.stringify(neuerTask), // stringifizieren siehe oben
+  		success:function( response ) {
+  			if ( response.id ) {
+  				alert( 'Eintrag gespeichert.' );
+  				$( '#neuerEintrag' ).get(0).reset(); // Formular zurücksetzen
+  				$( '#newTask' ).prop('disabled', false );
+  			}
+  		}
+  	});
+
+  });
+
+  </script>
+  <style>
+  ol { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+  li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
+  li span { position: absolute; margin-left: -1.3em; }
+  </style>
+</head>
+<body>
+  <h2>To-do-Liste</h2>
+<div id="liste">
+  <ol>
+  </ol>
+</div>
+<form id="neuerEintrag">
+  <input type="text" id="nTask" placeholder="Task">
+  <input type="text" id="erstam" placeholder="erstellt am">
+  <input type="text" id="erlam" placeholder="erledigt am">
+  <select id="selprio">
+    <option value="">bitte auswählen...</option>
+    <option value="Niedrig">Niedrig</option>
+    <option value="Mittel">Mittel</option>
+    <option value="Hoch">Hoch</option>
+  </select>
+  <button id="newTask">Neuen Task erstellen</button>
+</form>
+</body>
+</html>

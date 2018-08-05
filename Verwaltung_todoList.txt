@@ -1,0 +1,106 @@
+QUIZ Datenverwaltung
+Schnittstellenbeschreibung
+
+URL: http://localhost:8000
+
+1.) Neue Aufgabe eintragen
+
+REQUEST-Methode: POST
+Format Daten: JSON
+Daten:
+{
+  anfragetyp:'neu',
+  Aufgabe:STRING,
+  DatumErstelltAm:STRING,
+  DatumErledigtAm:STRING,
+  Prioritaet:STRING,
+}
+
+RESPONSE
+Format-Daten: JSON
+Daten - Erfolg:
+{
+  id:INTEGER
+}
+
+Fehler:
+{
+  fehlernummer: INTEGER,
+  feldname (Optional): STRING
+}
+
+2.) Aufgabe ändern
+
+REQUEST-Methode: POST
+Format Daten: JSON
+Daten:
+{
+  anfragetyp:'edit',
+  id: INTEGER,
+  Aufgabe:STRING,
+  DatumErstelltAm:STRING,
+  DatumErledigtAm:STRING,
+  Priorität:STRING,
+}
+
+RESPONSE
+Format-Daten: JSON
+Daten - Erfolg:
+{
+  erfolg:true
+}
+
+
+3.) Zeige Aufgaben
+
+REQUEST-Methode: POST
+Format Daten: JSON
+Daten:
+{
+  anfragetyp:'lesen',
+  id:Integer,
+  DatumErstelltAm:STRING,
+  DatumErledigtAm:STRING,
+  Priorität:STRING,
+}
+
+RESPONSE
+Format-Daten: JSON
+Daten - Erfolg:
+{
+  fragen:ARRAY mit Objekt der Aufgaben
+}
+
+FrageObjekt
+{
+    id: INTEGER,
+    Aufgabe:STRING,
+    DatumErstelltAm:STRING,
+    DatumErledigtAm:STRING,
+    Priorität:STRING,
+}
+
+4.) Aufgabe löschen
+
+REQUEST-Methode: POST
+Format Daten: JSON
+Daten:
+{
+  anfragetyp:'entfernen',
+  id: INTEGER,
+}
+
+RESPONSE
+Format-Daten: JSON
+Daten - Erfolg:
+{
+  erfolg:true
+}
+
+
+Anhang A) Fehlernummern
+404 -> nicht gefunden
+406 -> Datenformat/inhalt nicht korrekt
+407 -> Daten nicht vollständig
+408 -> Duplikat
+500 -> allgemeiner Fehler
